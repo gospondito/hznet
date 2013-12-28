@@ -1,6 +1,13 @@
 body {
   font: 16px Open Sans, Arial Black;
 }
+input {
+  height: 28px;
+  width: auto;
+}
+.vlak {
+  width: 400px;
+}
 #content {
   width: 1000px;
   height: 300px;

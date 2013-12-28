@@ -27,8 +27,6 @@ var polazak = new Array();
 
 function getNewPlan(customPol, customDol, customDate, customDir, callback){
 	// PATH ZA HZNET
-	//var ppath1 = "/hzinfo/default.asp?NKOD1=VRAP%C8E&ddList1=VRAP%C8E&ODH=&NKDO1=ZAGREB+GL.+KOL.&ddList2=ZAGREB+GL.+KOL.&DOH=&K1=&K2=&DT=09.11.13&DV=D&Category=hzinfo&Service=Vred3&LANG=HR&SCREEN=2";
-	//var ppath2 = "/hzinfo/default.asp?NKOD1=ZAGREB+GL.+KOL.&ddList1=ZAGREB+GL.+KOL.&ODH=&NKDO1=LUDBREG&ddList2=LUDBREG&DOH=&K1=&K2=&DT=06.11.13&DV=S&Category=hzinfo&Service=vred3&LANG=HR&SCREEN=2"
 	// **POL** polazni **DOL** dolazni **DATE** datum **DIR** s vezom/bez (D/S)
 	customPol=toKurac(customPol);
 	customDol=toKurac(customDol);
@@ -38,8 +36,6 @@ function getNewPlan(customPol, customDol, customDate, customDir, callback){
 							.replace(/xxDOLxxx/gi, customDol)
 							.replace(/xxDATExxx/gi,customDate)
 							.replace(/xxDIRxxx/gi, customDir);
-	//function setPath1(){ setPath("VRAP%C8E","ZAGREB+GL.+KOL.","21.12.13","D"); }
-	//function setPath2(){ setPath("ZAGREB+GL.+KOL.","LUDBREG","21.12.13","S"); }
 	var options = {
 	    host: 'vred.hzinfra.hr',
 	    path: customPath,
@@ -54,26 +50,20 @@ function getNewPlan(customPol, customDol, customDate, customDir, callback){
 	        data = Buffer.concat([data, chunk]);
 	    });
 	    res.on('end', function () {
-	        //console.log(String.fromCharCode(data));
-	        //console.log(options.path);
 	        var $ = cheerio.load(data);
-
 			// DOLAZAK
 			$('td', 'table').filter(function (i,el){
 				return $(this).attr('width') == '8%';
 				}).each(function (i,link){
 					if (i%2==0) dolazak.push((this).html());
 					});
-
 			// POLAZAK
 			$('td', 'table').filter(function (i,el){
 					return $(this).attr('width') == '10%';
 				}).each(function (i,link){
-					//console.log($(this).text());
 					polazak.push($(this).text());
 			});
 			callback();
-				//displayData(data);
 		});
 	});
 	request1.end();
@@ -115,23 +105,19 @@ function getStationsArray(callback){
 			callback();
 		});
 	});
-					console.log(popis);
 	request2.end();
 	console.log("getStationsArray ran");
 }
 
 app.get("/", function (req,res) {
-	///console.log(popis);
 	getStationsArray(function (){
 		res.render("intro", {"popis":popis});
 		res.end();
 		console.log("get /");
-		//console.log(popis);
 	});
 });
 
 app.get("/raspored", function (req,res){
-	//res.writeHead(200, {'Content-Type': 'text/plain'});
 	res.render("raspored", {polazak:polazak, dolazak:dolazak});
 	res.end();
 	console.log("get raspored");
@@ -141,11 +127,8 @@ app.post("/raspored", function (req,res){
 	var today = new Date();
 	var date = today.getDate() + '.' + (+today.getMonth()+ +1) + '.' + (today.getFullYear()).toString().substring(2,4);
 	getNewPlan(req.body.polaziste, req.body.dolaziste, date, 'D', function (){
-		//console.log(polazak);
 		res.render("raspored", {"polazak":polazak, "dolazak":dolazak});
 		res.end();
-		//console.log(new Date());
-		//console.log(polazak+'+');
 	});
 	console.log("post raspored");
 });
